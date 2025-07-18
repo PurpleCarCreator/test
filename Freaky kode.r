@@ -68,3 +68,58 @@ for (i in 1:5) {
 data <- read.csv("Fraud.csv")
 data(mtcars)
 head(mtcars)
+
+
+
+
+
+#Plottefunksjoner for Svindeldatasett
+
+library(ggplot2)
+library(dplyr)
+
+#eksempeldata
+set.seed(123)
+svindel_data <- data.frame(
+  TransaksjonsID = 1:500,
+  Beløp = c(rgamma(450, shape = 2, scale = 50), 
+            rgamma(50, shape = 10, scale = 500)),
+  Dato = seq.Date(from = as.Date("2023-01-01"), by = "day", length.out = 500),
+  Land = sample(c("Norge", "Sverige", "Danmark", "Annet"), 500, replace = TRUE),
+  Svindel = c(rep(0, 450), rep(1, 50))
+)
+
+#Histogram
+ggplot(svindel_data, aes(x = Beløp, fill = factor(Svindel))) +
+  geom_histogram(bins = 30, alpha = 0.7) +
+  scale_fill_manual(values = c("blue", "red"), 
+                    labels = c("Normal", "Svindel")) +
+  labs(title = "Fordeling av Transaksjonsbeløp",
+       x = "Beløp (NOK)",
+       y = "Antall Transaksjoner",
+       fill = "Transaksjonstype") +
+  theme_minimal()
+
+#Boxplot
+ggplot(svindel_data, aes(x = Land, y = Beløp, fill = factor(Svindel))) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("skyblue", "red"), 
+                    labels = c("Normal", "Svindel")) +
+  labs(title = "Transaksjonsbeløp etter Land",
+       x = "Land",
+       y = "Beløp (NOK)",
+       fill = "Transaksjonstype") +
+  theme_minimal()
+
+#Tidslinje for svindelhendelser
+svindel_data %>%
+  filter(Svindel == 1) %>%
+  group_by(Dato) %>%
+  summarise(Antall = n()) %>%
+  ggplot(aes(x = Dato, y = Antall)) +
+  geom_line(color = "red") +
+  geom_point(color = "darkred") +
+  labs(title = "Svindelhendelser over Tid",
+       x = "Dato",
+       y = "Antall Svindelforsøk") +
+  theme_minimal()
