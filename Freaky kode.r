@@ -123,3 +123,45 @@ svindel_data %>%
        x = "Dato",
        y = "Antall Svindelforsøk") +
   theme_minimal()
+
+
+
+
+
+set.seed(123)
+coffee_data <- data.frame(
+  shop = rep(c("Java", "Brew", "Aroma"), each = 30),
+  day = rep(1:30, 3),
+  temp = round(rnorm(90, mean = 22, sd = 5), 1),
+  sales = c(rpois(30, 120), rpois(30, 95), rpois(30, 110))
+)
+
+library(ggplot2)
+ggplot(coffee_data, aes(x = temp, y = sales, color = shop)) +
+  geom_point(size = 3, alpha = 0.7) +
+  geom_smooth(method = "lm", se = FALSE) +
+  scale_color_manual(values = c("#6F4E37", "#C0A080", "#3E2723")) +
+  theme_minimal()
+
+library(dplyr)
+coffee_data %>%
+  group_by(shop) %>%
+  summarise(
+    avg_sales = mean(sales),
+    max_temp = max(temp),
+    min_temp = min(temp)
+  ) %>%
+  arrange(-avg_sales) %>%
+  mutate(profit = avg_sales * 4.5 - 300)
+
+latte_art <- function(attempts) {
+  results <- sample(c("❤️", "🌷", "☕", "❌"), attempts, 
+                   prob = c(0.2, 0.3, 0.4, 0.1), replace = TRUE)
+  table(results)
+}
+
+latte_art(100)
+
+coffee_palette <- colorRampPalette(c("#3E2723", "#6F4E37", "#C0A080"))
+barplot(rep(1,10), col = coffee_palette(10), 
+        border = NA, axes = FALSE, space = 0)
